@@ -51,6 +51,4 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Endpoint latihan untuk menguji role. Akan dihapus di tahap berikutnya.
-    [Authorize(Roles = "Pimpinan")]
 }
