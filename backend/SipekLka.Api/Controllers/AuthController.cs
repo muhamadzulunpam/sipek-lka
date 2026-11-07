@@ -53,6 +53,4 @@ public class AuthController : ControllerBase
 
     // Endpoint latihan untuk menguji role. Akan dihapus di tahap berikutnya.
     [Authorize(Roles = "Pimpinan")]
-    [HttpGet("test-pimpinan")]
-    public IActionResult TestPimpinan() => Ok(new { message = "Halo Pimpinan, akses diterima." });
 }
