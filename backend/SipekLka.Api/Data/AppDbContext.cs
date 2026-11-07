@@ -11,6 +11,10 @@ public class AppDbContext : DbContext
     public DbSet<Bidang> Bidangs => Set<Bidang>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LaporanKinerja> LaporanKinerja => Set<LaporanKinerja>();
+    public DbSet<BuktiLaporan> BuktiLaporan => Set<BuktiLaporan>();
+    public DbSet<ReviewLaporan> ReviewLaporan => Set<ReviewLaporan>();
+    public DbSet<RiwayatStatus> RiwayatStatus => Set<RiwayatStatus>();
+
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -19,6 +23,12 @@ public class AppDbContext : DbContext
         b.Entity<User>().HasIndex(x => x.Email).IsUnique();
         b.Entity<LaporanKinerja>().Property(x => x.Target).HasPrecision(18, 2);
         b.Entity<LaporanKinerja>().Property(x => x.Realisasi).HasPrecision(18, 2);
+        b.Entity<BuktiLaporan>().Property(x => x.NamaFile).HasMaxLength(255).IsRequired();
+        b.Entity<BuktiLaporan>().Property(x => x.PathFile).HasMaxLength(500).IsRequired();
+        b.Entity<BuktiLaporan>().Property(x => x.TipeKonten).HasMaxLength(100);
+        b.Entity<ReviewLaporan>().Property(x => x.Catatan).HasMaxLength(2000);
+        b.Entity<RiwayatStatus>().Property(x => x.Keterangan).HasMaxLength(500);
+
 
         // Hindari multiple cascade path di SQL Server
         b.Entity<LaporanKinerja>()
@@ -26,6 +36,17 @@ public class AppDbContext : DbContext
             .HasForeignKey(l => l.DibuatOlehUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Review & Riwayat: ikut terhapus bersama laporan, tapi user tidak boleh terhapus otomatis
+        b.Entity<ReviewLaporan>()
+            .HasOne(r => r.Reviewer).WithMany()
+            .HasForeignKey(r => r.ReviewerUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        b.Entity<RiwayatStatus>()
+            .HasOne(r => r.DiubahOleh).WithMany()
+            .HasForeignKey(r => r.DiubahOlehUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+            
         // Seed data awal
         b.Entity<Role>().HasData(
             new Role { Id = 1, Nama = "Pimpinan" },
