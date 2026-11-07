@@ -20,4 +20,8 @@ public class LaporanKinerja
 
     public int DibuatOlehUserId { get; set; }
     public User DibuatOleh { get; set; } = null!;
+
+    public ICollection<BuktiLaporan> Bukti { get; set; } = new List<BuktiLaporan>();
+    public ICollection<ReviewLaporan> Reviews { get; set; } = new List<ReviewLaporan>();
+    public ICollection<RiwayatStatus> Riwayat { get; set; } = new List<RiwayatStatus>();
 }

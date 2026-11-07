@@ -67,6 +67,45 @@ namespace SipekLka.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("SipekLka.Api.Models.BuktiLaporan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DiunggahPada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LaporanKinerjaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NamaFile")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PathFile")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TipeKonten")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<long>("UkuranByte")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaporanKinerjaId");
+
+                    b.ToTable("BuktiLaporan");
+                });
+
             modelBuilder.Entity("SipekLka.Api.Models.LaporanKinerja", b =>
                 {
                     b.Property<int>("Id")
@@ -128,6 +167,76 @@ namespace SipekLka.Api.Migrations
                     b.HasIndex("DibuatOlehUserId");
 
                     b.ToTable("LaporanKinerja");
+                });
+
+            modelBuilder.Entity("SipekLka.Api.Models.ReviewLaporan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Catatan")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("DireviewPada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Keputusan")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LaporanKinerjaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ReviewerUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaporanKinerjaId");
+
+                    b.HasIndex("ReviewerUserId");
+
+                    b.ToTable("ReviewLaporan");
+                });
+
+            modelBuilder.Entity("SipekLka.Api.Models.RiwayatStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiubahOlehUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DiubahPada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Keterangan")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("LaporanKinerjaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusBaru")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusLama")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiubahOlehUserId");
+
+                    b.HasIndex("LaporanKinerjaId");
+
+                    b.ToTable("RiwayatStatus");
                 });
 
             modelBuilder.Entity("SipekLka.Api.Models.Role", b =>
@@ -198,6 +307,17 @@ namespace SipekLka.Api.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SipekLka.Api.Models.BuktiLaporan", b =>
+                {
+                    b.HasOne("SipekLka.Api.Models.LaporanKinerja", "LaporanKinerja")
+                        .WithMany("Bukti")
+                        .HasForeignKey("LaporanKinerjaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LaporanKinerja");
+                });
+
             modelBuilder.Entity("SipekLka.Api.Models.LaporanKinerja", b =>
                 {
                     b.HasOne("SipekLka.Api.Models.Bidang", "Bidang")
@@ -215,6 +335,44 @@ namespace SipekLka.Api.Migrations
                     b.Navigation("Bidang");
 
                     b.Navigation("DibuatOleh");
+                });
+
+            modelBuilder.Entity("SipekLka.Api.Models.ReviewLaporan", b =>
+                {
+                    b.HasOne("SipekLka.Api.Models.LaporanKinerja", "LaporanKinerja")
+                        .WithMany("Reviews")
+                        .HasForeignKey("LaporanKinerjaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SipekLka.Api.Models.User", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LaporanKinerja");
+
+                    b.Navigation("Reviewer");
+                });
+
+            modelBuilder.Entity("SipekLka.Api.Models.RiwayatStatus", b =>
+                {
+                    b.HasOne("SipekLka.Api.Models.User", "DiubahOleh")
+                        .WithMany()
+                        .HasForeignKey("DiubahOlehUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SipekLka.Api.Models.LaporanKinerja", "LaporanKinerja")
+                        .WithMany("Riwayat")
+                        .HasForeignKey("LaporanKinerjaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DiubahOleh");
+
+                    b.Navigation("LaporanKinerja");
                 });
 
             modelBuilder.Entity("SipekLka.Api.Models.User", b =>
@@ -239,6 +397,15 @@ namespace SipekLka.Api.Migrations
                     b.Navigation("Laporan");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("SipekLka.Api.Models.LaporanKinerja", b =>
+                {
+                    b.Navigation("Bukti");
+
+                    b.Navigation("Reviews");
+
+                    b.Navigation("Riwayat");
                 });
 
             modelBuilder.Entity("SipekLka.Api.Models.Role", b =>
