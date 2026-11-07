@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SipekLka.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SipekLka.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class BidangController : ControllerBase
 {
