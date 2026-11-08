@@ -46,6 +46,8 @@ public class AppDbContext : DbContext
             .HasOne(r => r.DiubahOleh).WithMany()
             .HasForeignKey(r => r.DiubahOlehUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+            b.Entity<LaporanKinerja>().Property(x => x.RowVersion).IsRowVersion();
             
         // Seed data awal
         b.Entity<Role>().HasData(
