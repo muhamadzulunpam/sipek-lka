@@ -1,4 +1,5 @@
 export type StatusLaporan = 'Draft' | 'Submitted' | 'Revision' | 'Approved' | 'Rejected';
+export type Keputusan = 'Approved' | 'Revision' | 'Rejected';
 
 export interface LoginResponse {
   token: string;
@@ -62,4 +63,34 @@ export interface PagedResult<T> {
   pageSize: number;
   totalItems: number;
   totalPages: number;
+}
+
+export interface BuktiResponse {
+  id: number;
+  namaFile: string;
+  tipeKonten: string;
+  ukuranByte: number;
+  diunggahPada: string;
+}
+
+export interface ReviewRequest {
+  keputusan: Keputusan;
+  catatan: string | null;
+}
+
+export interface ReviewResponse {
+  id: number;
+  keputusan: StatusLaporan;
+  catatan: string;
+  direviewPada: string;
+  reviewer: string;
+}
+
+export interface RiwayatResponse {
+  id: number;
+  statusLama: StatusLaporan;
+  statusBaru: StatusLaporan;
+  keterangan: string | null;
+  diubahPada: string;
+  diubahOleh: string;
 }
