@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SipekLka.Api.Data;
 using SipekLka.Api.Dtos;
 using SipekLka.Api.Models;
+using SipekLka.Api.Services;
 
 namespace SipekLka.Api.Controllers;
 
@@ -14,10 +15,12 @@ namespace SipekLka.Api.Controllers;
 public class LaporanController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly IFileStorage _storage;
 
-    public LaporanController(AppDbContext db)
+    public LaporanController(AppDbContext db, IFileStorage storage)
     {
         _db = db;
+        _storage = storage;
     }
 
     // --- Informasi user dari token ---
@@ -26,15 +29,7 @@ public class LaporanController : ControllerBase
         int.TryParse(User.FindFirst("bidangId")?.Value, out var id) ? id : null;
     private bool IsPimpinan => User.IsInRole("Pimpinan");
 
-    // --- Query dasar yang sudah dibatasi sesuai siapa yang login ---
-    private IQueryable<LaporanKinerja> ScopedQuery()
-    {
-        if (IsPimpinan)
-            return _db.LaporanKinerja.Where(l => l.Status != StatusLaporan.Draft);
-
-        var bidangId = CurrentBidangId;
-        return _db.LaporanKinerja.Where(l => l.BidangId == bidangId);
-    }
+    private IQueryable<LaporanKinerja> ScopedQuery() => _db.LaporanKinerja.ScopedFor(User);
 
     private static readonly Expression<Func<LaporanKinerja, LaporanResponse>> ToResponse =
         l => new LaporanResponse(
@@ -151,14 +146,21 @@ public class LaporanController : ControllerBase
     [Authorize(Roles = "KepalaBidang")]
     public async Task<IActionResult> Delete(int id)
     {
-        var laporan = await ScopedQuery().FirstOrDefaultAsync(l => l.Id == id);
+        var laporan = await ScopedQuery()
+            .Include(l => l.Bukti)
+            .FirstOrDefaultAsync(l => l.Id == id);
         if (laporan is null) return NotFound();
 
         if (laporan.Status != StatusLaporan.Draft)
             return Conflict(new { message = "Hanya laporan berstatus Draft yang bisa dihapus." });
 
+        var storedNames = laporan.Bukti.Select(b => b.PathFile).ToList();
+
         _db.LaporanKinerja.Remove(laporan);
         await _db.SaveChangesAsync();
+
+        foreach (var name in storedNames)
+            _storage.Delete(name);
 
         return NoContent();
     }
