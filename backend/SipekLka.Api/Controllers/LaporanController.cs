@@ -15,10 +15,12 @@ namespace SipekLka.Api.Controllers;
 public class LaporanController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly IFileStorage _storage;
 
-    public LaporanController(AppDbContext db)
+    public LaporanController(AppDbContext db, IFileStorage storage)
     {
         _db = db;
+        _storage = storage;
     }
 
     // --- Informasi user dari token ---
@@ -144,14 +146,21 @@ public class LaporanController : ControllerBase
     [Authorize(Roles = "KepalaBidang")]
     public async Task<IActionResult> Delete(int id)
     {
-        var laporan = await ScopedQuery().FirstOrDefaultAsync(l => l.Id == id);
+        var laporan = await ScopedQuery()
+            .Include(l => l.Bukti)
+            .FirstOrDefaultAsync(l => l.Id == id);
         if (laporan is null) return NotFound();
 
         if (laporan.Status != StatusLaporan.Draft)
             return Conflict(new { message = "Hanya laporan berstatus Draft yang bisa dihapus." });
 
+        var storedNames = laporan.Bukti.Select(b => b.PathFile).ToList();
+
         _db.LaporanKinerja.Remove(laporan);
         await _db.SaveChangesAsync();
+
+        foreach (var name in storedNames)
+            _storage.Delete(name);
 
         return NoContent();
     }
