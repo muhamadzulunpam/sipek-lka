@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SipekLka.Api.Data;
 using SipekLka.Api.Dtos;
 using SipekLka.Api.Models;
+using SipekLka.Api.Services;
 
 namespace SipekLka.Api.Controllers;
 
@@ -26,15 +27,7 @@ public class LaporanController : ControllerBase
         int.TryParse(User.FindFirst("bidangId")?.Value, out var id) ? id : null;
     private bool IsPimpinan => User.IsInRole("Pimpinan");
 
-    // --- Query dasar yang sudah dibatasi sesuai siapa yang login ---
-    private IQueryable<LaporanKinerja> ScopedQuery()
-    {
-        if (IsPimpinan)
-            return _db.LaporanKinerja.Where(l => l.Status != StatusLaporan.Draft);
-
-        var bidangId = CurrentBidangId;
-        return _db.LaporanKinerja.Where(l => l.BidangId == bidangId);
-    }
+    private IQueryable<LaporanKinerja> ScopedQuery() => _db.LaporanKinerja.ScopedFor(User);
 
     private static readonly Expression<Func<LaporanKinerja, LaporanResponse>> ToResponse =
         l => new LaporanResponse(
