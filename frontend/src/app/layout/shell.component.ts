@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/auth.service';
 
 @Component({
@@ -19,6 +19,7 @@ import { AuthService } from '../core/auth.service';
           }
         </div>
 
+        <!-- MENU NAVIGASI -->
         <nav class="nav">
           <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
             <span class="nav-icon">🏠</span>
@@ -26,19 +27,7 @@ import { AuthService } from '../core/auth.service';
           </a>
           <a class="nav-item" routerLink="/laporan" routerLinkActive="active">
             <span class="nav-icon">📝</span>
-            @if (!collapsed()) { <span>Laporan Kinerja</span> }
-          </a>
-          <a class="nav-item" routerLink="/riwayat" routerLinkActive="active">
-            <span class="nav-icon">📁</span>
-            @if (!collapsed()) { <span>Riwayat Laporan</span> }
-          </a>
-          <a class="nav-item" routerLink="/statistik" routerLinkActive="active">
-            <span class="nav-icon">📈</span>
-            @if (!collapsed()) { <span>Statistik</span> }
-          </a>
-          <a class="nav-item" routerLink="/pengaturan" routerLinkActive="active">
-            <span class="nav-icon">⚙️</span>
-            @if (!collapsed()) { <span>Pengaturan</span> }
+            @if (!collapsed()) { <span>Laporan</span> }
           </a>
         </nav>
 
@@ -91,7 +80,7 @@ import { AuthService } from '../core/auth.service';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     :host {
       display: block;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -120,10 +109,8 @@ import { AuthService } from '../core/auth.service';
       box-shadow: 8px 0 30px rgba(74, 158, 255, 0.15);
       transition: width 0.3s ease, padding 0.3s ease;
       flex-shrink: 0;
-      overflow: hidden; /* Mencegah elemen keluar saat collapse */
+      overflow: hidden;
     }
-    
-    /* Perbaikan saat collapsed: padding lebih kecil & center */
     .sidebar.collapsed {
       width: 88px;
       padding: 24px 12px;
@@ -133,12 +120,10 @@ import { AuthService } from '../core/auth.service';
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 0 20px; /* Ubah padding kiri-kanan jadi 0 agar border pas */
+      padding: 8px 0 20px;
       margin-bottom: 20px;
       position: relative;
     }
-    
-    /* Garis border dibuat pseudo-element agar lebih rapi saat collapse */
     .brand::after {
       content: '';
       position: absolute;
@@ -159,10 +144,8 @@ import { AuthService } from '../core/auth.service';
       font-size: 22px;
       backdrop-filter: blur(8px);
       flex-shrink: 0;
-      margin: 0 auto; /* Paksa ikon ke tengah saat collapsed */
+      margin: 0 auto;
     }
-
-    /* Saat expanded, kembalikan ikon ke kiri */
     .sidebar:not(.collapsed) .brand-icon {
       margin: 0;
     }
@@ -185,6 +168,7 @@ import { AuthService } from '../core/auth.service';
       color: rgba(13, 51, 99, 0.7);
     }
 
+    /* ===== NAVIGATION ===== */
     .nav {
       display: flex;
       flex-direction: column;
@@ -209,7 +193,7 @@ import { AuthService } from '../core/auth.service';
       font-family: inherit;
       width: 100%;
       text-align: left;
-      box-sizing: border-box; /* Pastikan padding tidak menambah lebar */
+      box-sizing: border-box;
     }
 
     /* Saat collapsed, tombol menu dibuat kotak & center */
@@ -239,7 +223,6 @@ import { AuthService } from '../core/auth.service';
       padding-top: 14px;
       margin-top: 8px;
     }
-    /* Garis border footer rapi */
     .sidebar-footer::before {
       content: '';
       position: absolute;
@@ -409,7 +392,7 @@ import { AuthService } from '../core/auth.service';
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         border-radius: 0 24px 24px 0;
-        width: 260px; /* Paksa lebar penuh di mobile */
+        width: 260px;
         padding: 24px 16px;
       }
       .sidebar:not(.collapsed) {
