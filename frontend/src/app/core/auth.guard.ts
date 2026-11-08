@@ -15,3 +15,9 @@ export const guestGuard: CanActivateFn = () => {
   const router = inject(Router);
   return auth.isAuthenticated() ? router.createUrlTree(['/dashboard']) : true;
 };
+// Halaman khusus satu role. Role lain dialihkan ke daftar laporan.
+export const roleGuard = (role: 'Pimpinan' | 'KepalaBidang'): CanActivateFn => () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  return auth.session()?.role === role ? true : router.createUrlTree(['/laporan']);
+};
