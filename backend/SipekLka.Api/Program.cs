@@ -67,7 +67,10 @@ if (app.Environment.IsDevelopment())
         await DbSeeder.SeedUsersAsync(db, defaultPassword);
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("Angular");
 app.UseAuthentication();
 app.UseAuthorization();

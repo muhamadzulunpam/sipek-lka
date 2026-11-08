@@ -1,2 +1,1 @@
-// Ganti PORT sesuai applicationUrl https di launchSettings.json
-export const API_URL = 'https://localhost:7001/api';
+export const API_URL = 'http://localhost:5232/api';
