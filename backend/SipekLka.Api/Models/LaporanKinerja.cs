@@ -24,4 +24,6 @@ public class LaporanKinerja
     public ICollection<BuktiLaporan> Bukti { get; set; } = new List<BuktiLaporan>();
     public ICollection<ReviewLaporan> Reviews { get; set; } = new List<ReviewLaporan>();
     public ICollection<RiwayatStatus> Riwayat { get; set; } = new List<RiwayatStatus>();
+
+        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 }
