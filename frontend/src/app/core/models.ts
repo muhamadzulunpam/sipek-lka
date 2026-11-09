@@ -94,3 +94,26 @@ export interface RiwayatResponse {
   diubahPada: string;
   diubahOleh: string;
 }
+
+export interface BidangStat {
+  bidangId: number;
+  namaBidang: string;
+  draft: number;
+  submitted: number;
+  revision: number;
+  approved: number;
+  rejected: number;
+  total: number;
+}
+
+export interface DashboardResponse {
+  periode: string | null;
+  total: number;
+  draft: number;
+  submitted: number;
+  revision: number;
+  approved: number;
+  rejected: number;
+  totalKepalaBidang: number | null;
+  perBidang: BidangStat[];
+}
