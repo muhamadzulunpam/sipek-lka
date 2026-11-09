@@ -368,3 +368,165 @@ button.btn-link:hover {
 .timeline li:last-child {
   padding-bottom: 0;
 }
+/* ===== PANEL WIDE ===== */
+.panel-wide { 
+  max-width: none; 
+}
+
+/* ===== DASHBOARD CARDS ===== */
+.dash-cards { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 16px; 
+  margin-bottom: 24px; 
+}
+
+.dash-card { 
+  display: flex; 
+  align-items: center;
+  gap: 14px;
+  background: #ffffff; 
+  border-radius: 16px; 
+  padding: 18px 20px; 
+  color: inherit;
+  text-decoration: none; 
+  box-shadow: 0 2px 10px rgba(74, 158, 255, 0.06); 
+  border: 1px solid #f1f5f9;
+  border-left: 4px solid #94a3b8; 
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+a.dash-card:hover { 
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(74, 158, 255, 0.15); 
+}
+
+.dash-card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  opacity: 0.08;
+  transform: translate(30%, -30%);
+}
+
+/* Tone / Warna Border */
+.dash-card[data-tone='Total'] { border-left-color: #4a9eff; }
+.dash-card[data-tone='Total']::after { background: #4a9eff; }
+
+.dash-card[data-tone='Draft'] { border-left-color: #94a3b8; }
+.dash-card[data-tone='Draft']::after { background: #94a3b8; }
+
+.dash-card[data-tone='Submitted'] { border-left-color: #3b82f6; }
+.dash-card[data-tone='Submitted']::after { background: #3b82f6; }
+
+.dash-card[data-tone='Revision'] { border-left-color: #f59e0b; }
+.dash-card[data-tone='Revision']::after { background: #f59e0b; }
+
+.dash-card[data-tone='Approved'] { border-left-color: #22c55e; }
+.dash-card[data-tone='Approved']::after { background: #22c55e; }
+
+.dash-card[data-tone='Rejected'] { border-left-color: #ef4444; }
+.dash-card[data-tone='Rejected']::after { background: #ef4444; }
+
+.dash-card .value { 
+  font-size: 26px; 
+  font-weight: 800; 
+  line-height: 1.1; 
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.dash-card .label { 
+  color: #64748b; 
+  font-size: 12px; 
+  font-weight: 600;
+}
+
+/* ===== CHART ===== */
+.chart-row { 
+  display: grid; 
+  grid-template-columns: minmax(120px, 240px) 1fr 44px; 
+  gap: 16px; 
+  align-items: center; 
+  padding: 6px 0; 
+}
+
+.chart-label { 
+  font-size: 13px; 
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chart-total { 
+  text-align: right; 
+  font-weight: 800; 
+  font-size: 14px;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-bar { 
+  display: flex; 
+  height: 24px; 
+  background: #f1f5f9; 
+  border-radius: 8px; 
+  overflow: hidden; 
+  gap: 2px;
+  padding: 2px;
+}
+
+.chart-seg { 
+  height: 100%; 
+  min-width: 4px; 
+  background: #94a3b8; 
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+.chart-seg:hover {
+  opacity: 0.85;
+}
+
+/* Warna Segmen */
+.chart-seg[data-status='Submitted'], .legend-dot[data-status='Submitted'] { background: #3b82f6; }
+.chart-seg[data-status='Revision'], .legend-dot[data-status='Revision'] { background: #f59e0b; }
+.chart-seg[data-status='Approved'], .legend-dot[data-status='Approved'] { background: #22c55e; }
+.chart-seg[data-status='Rejected'], .legend-dot[data-status='Rejected'] { background: #ef4444; }
+.chart-seg[data-status='Draft'], .legend-dot[data-status='Draft'] { background: #94a3b8; }
+
+.chart-legend { 
+  display: flex; 
+  gap: 16px; 
+  flex-wrap: wrap; 
+  font-size: 13px; 
+  font-weight: 600;
+  margin-top: 20px; 
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+}
+
+.legend-dot { 
+  display: inline-block; 
+  width: 10px; 
+  height: 10px; 
+  border-radius: 50%; 
+  background: #94a3b8; 
+}
+
+@media (max-width: 640px) {
+  .chart-row { grid-template-columns: 1fr 44px; gap: 8px 12px; }
+  .chart-label { grid-column: 1 / -1; }
+}

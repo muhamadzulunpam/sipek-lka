@@ -2,7 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { LaporanService } from '../../core/laporan.service';
 import { Bidang, LaporanListItem, PagedResult, StatusLaporan } from '../../core/models';
@@ -391,6 +391,8 @@ export class LaporanListComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(LaporanService);
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+
 
   private readonly pageSize = 10;
 
@@ -416,6 +418,18 @@ export class LaporanListComponent implements OnInit {
   canDelete = (l: LaporanListItem) => isDeletable(l.status);
 
   ngOnInit() {
+    // Filter awal dari URL, mis. /laporan?status=Submitted. Nilai yang tidak valid diabaikan.
+    const q = this.route.snapshot.queryParamMap;
+    const status = q.get('status');
+    const periode = q.get('periode');
+    const bidangId = q.get('bidangId');
+
+    this.filter.patchValue({
+      status: STATUS_OPTIONS.some(s => s.value === status) ? status! : '',
+      periode: periode && PERIODE_PATTERN.test(periode) ? periode : '',
+      bidangId: bidangId && /^\d+$/.test(bidangId) ? bidangId : '',
+    });
+
     this.load();
     if (this.isPimpinan()) {
       this.api.bidangs().subscribe(b => this.bidangs.set(b));
