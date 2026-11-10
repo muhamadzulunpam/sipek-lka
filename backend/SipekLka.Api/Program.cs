@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SipekLka.Api.Data;
 using SipekLka.Api.Services;                              
 using System.Text.Json.Serialization;
+using SipekLka.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +54,10 @@ builder.Services.AddCors(options =>
         .AllowAnyMethod()
         .WithExposedHeaders("Content-Disposition")); // dipakai nanti untuk unduh bukti
 });
-
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 var app = builder.Build();
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
