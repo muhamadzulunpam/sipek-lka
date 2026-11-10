@@ -6,6 +6,7 @@ using SipekLka.Api.Data;
 using SipekLka.Api.Services;                              
 using System.Text.Json.Serialization;
 using SipekLka.Api.Infrastructure;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +63,7 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
