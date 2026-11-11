@@ -6,4 +6,5 @@ public record LoginResponse(
     string NamaLengkap,
     string Role,
     int? BidangId,
-    string? NamaBidang);
+    string? NamaBidang,
+    bool WajibGantiPassword);

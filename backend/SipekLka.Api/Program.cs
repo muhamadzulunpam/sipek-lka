@@ -42,6 +42,28 @@ builder.Services
             RoleClaimType = "role",
             ClockSkew = TimeSpan.Zero
         };
+        
+        options.Events = new JwtBearerEvents
+        {
+            // Dijalankan setelah tanda tangan token terbukti benar: cek akun di database
+            OnTokenValidated = async ctx =>
+            {
+                var sub = ctx.Principal?.FindFirst("sub")?.Value;
+                var tv = ctx.Principal?.FindFirst("tv")?.Value;
+
+                if (!int.TryParse(sub, out var userId) || !int.TryParse(tv, out var version))
+                {
+                    ctx.Fail("Token tidak valid.");
+                    return;
+                }
+
+                var db = ctx.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                var valid = await db.Users.AsNoTracking()
+                    .AnyAsync(u => u.Id == userId && u.IsAktif && u.TokenVersion == version);
+
+                if (!valid) ctx.Fail("Sesi tidak berlaku lagi.");
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -79,7 +101,21 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("Angular");
 app.UseAuthentication();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true
+        && context.User.HasClaim("mcp", "1")
+        && context.Request.Path.StartsWithSegments("/api")
+        && !context.Request.Path.StartsWithSegments("/api/auth"))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        await context.Response.WriteAsJsonAsync(
+            new { message = "Anda harus mengganti password terlebih dahulu." });
+        return;
+    }
 
+    await next();
+});
 app.MapControllers();
 
 app.Run();
