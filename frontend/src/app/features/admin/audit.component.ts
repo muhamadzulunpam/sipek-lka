@@ -155,7 +155,7 @@ function startOfLocalDayIso(value: string, addDays = 0): string | undefined {
       color: #64748b;
     }
 
-    /* ===== FILTERS ===== */
+        /* ===== FILTERS ===== */
     .filters {
       background: #ffffff;
       border-radius: 16px;
@@ -164,23 +164,33 @@ function startOfLocalDayIso(value: string, addDays = 0): string | undefined {
       padding: 20px;
       margin-bottom: 16px;
     }
+    
+    /* Gunakan flex agar input tidak turun ke bawah */
     .filter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 16px;
+      align-items: flex-end;
     }
+    
     .field {
       display: flex;
       flex-direction: column;
       gap: 6px;
+      flex: 1; /* Memaksa semua input mengisi ruang secara merata */
+      min-width: 160px; /* Batas minimal agar input tidak terlalu sempit */
     }
+    
     .field label {
       font-size: 13px;
       font-weight: 700;
       color: #1e293b;
     }
+    
     .field input, .field select {
+      width: 100%;
+      box-sizing: border-box; /* Penting: agar padding tidak menambah lebar */
       padding: 10px 14px;
       border: 1.5px solid #e2e8f0;
       border-radius: 10px;
@@ -191,17 +201,21 @@ function startOfLocalDayIso(value: string, addDays = 0): string | undefined {
       transition: all 0.2s ease;
       outline: none;
     }
+    
     .field input::placeholder { color: #94a3b8; }
+    
     .field input:focus, .field select:focus {
       border-color: #4a9eff;
       background: #ffffff;
       box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.14);
     }
+    
     .filter-actions {
       display: flex;
       gap: 8px;
       justify-content: flex-end;
     }
+    
     .err {
       margin: -8px 0 16px;
       color: #b91c1c;

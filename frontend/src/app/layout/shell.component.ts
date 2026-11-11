@@ -42,7 +42,7 @@ import { AuthService } from '../core/auth.service';
               </a>
               <a class="nav-item" routerLink="/audit" routerLinkActive="active">
                 <span class="nav-icon">📜</span>
-                @if (!collapsed()) { <span>Audit</span> }
+                @if (!collapsed()) { <span>Activity</span> }
               </a>
             }
           </nav>
@@ -72,15 +72,9 @@ import { AuthService } from '../core/auth.service';
             <button class="icon-btn" type="button" (click)="toggle()" aria-label="Toggle sidebar">
               ☰
             </button>
-            <div class="search-box">
-              <span class="search-icon">🔍</span>
-              <input type="text" placeholder="Cari laporan, bidang, atau periode..." />
-            </div>
           </div>
 
           <div class="bar-right">
-            <button class="icon-btn with-dot" type="button" aria-label="Notifikasi">🔔</button>
-
             @if (auth.session(); as s) {
               <div class="user-card">
                 <div class="avatar">
@@ -349,41 +343,6 @@ import { AuthService } from '../core/auth.service';
       background: #ef4444;
       border: 2px solid #ffffff;
     }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      padding: 10px 16px;
-      border-radius: 999px;
-      min-width: 280px;
-      max-width: 460px;
-      transition: all 0.2s ease;
-    }
-    .search-box:focus-within {
-      border-color: #4a9eff;
-      background: #ffffff;
-      box-shadow: 0 0 0 4px rgba(74, 158, 255, 0.14);
-    }
-    .search-icon {
-      font-size: 14px;
-      opacity: 0.6;
-    }
-    .search-box input {
-      border: none;
-      background: transparent;
-      outline: none;
-      flex: 1;
-      font-size: 14px;
-      font-family: inherit;
-      color: #0f172a;
-    }
-    .search-box input::placeholder {
-      color: #94a3b8;
-    }
-
     .user-card {
       display: flex;
       align-items: center;
@@ -446,9 +405,7 @@ import { AuthService } from '../core/auth.service';
         width: 260px;
         transform: translateX(-100%);
       }
-      .search-box {
-        display: none;
-      }
+      
       .user-info {
         display: none;
       }
