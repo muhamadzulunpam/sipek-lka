@@ -47,7 +47,12 @@ public class AppDbContext : DbContext
             .HasForeignKey(r => r.DiubahOlehUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-            b.Entity<LaporanKinerja>().Property(x => x.RowVersion).IsRowVersion();
+        b.Entity<LaporanKinerja>().Property(x => x.RowVersion).IsRowVersion();
+
+        // Default true di database, supaya akun yang sudah ada tidak menjadi nonaktif saat migration
+        b.Entity<User>().Property(x => x.IsAktif).HasDefaultValue(true);
+        b.Entity<Bidang>().HasIndex(x => x.Nama).IsUnique();
+
             
         // Seed data awal
         b.Entity<Role>().HasData(
