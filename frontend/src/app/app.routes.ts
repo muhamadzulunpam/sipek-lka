@@ -66,6 +66,12 @@ export const routes: Routes = [
           import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
       },
       {
+        path: 'audit',
+        canActivate: [roleGuard('Pimpinan')],
+        loadComponent: () =>
+          import('./features/admin/audit.component').then(m => m.AuditComponent),
+      },
+      {
         path: '',
         pathMatch: 'full',
         redirectTo: 'dashboard',

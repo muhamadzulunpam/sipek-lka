@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SipekLka.Api.Data;
 using SipekLka.Api.Dtos;
 using SipekLka.Api.Models;
+using SipekLka.Api.Services;
 
 namespace SipekLka.Api.Controllers;
 
@@ -13,10 +14,12 @@ namespace SipekLka.Api.Controllers;
 public class BidangController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly IAuditLogger _audit;
 
-    public BidangController(AppDbContext db)
+    public BidangController(AppDbContext db, IAuditLogger audit)
     {
         _db = db;
+        _audit = audit;
     }
 
     [HttpGet]
@@ -41,8 +44,13 @@ public class BidangController : ControllerBase
             return Conflict(new { message = "Nama bidang sudah ada." });
 
         var bidang = new Bidang { Nama = nama };
+
+        await using var tx = await _db.Database.BeginTransactionAsync();
         _db.Bidangs.Add(bidang);
         await _db.SaveChangesAsync();
+        _audit.Add(AuditActions.BidangDibuat, "Bidang", bidang.Id, bidang.Nama);
+        await _db.SaveChangesAsync();
+        await tx.CommitAsync();
 
         return StatusCode(StatusCodes.Status201Created, new BidangResponse(bidang.Id, bidang.Nama));
     }
@@ -60,7 +68,12 @@ public class BidangController : ControllerBase
         if (await _db.Bidangs.AnyAsync(b => b.Nama == nama && b.Id != id))
             return Conflict(new { message = "Nama bidang sudah ada." });
 
-        bidang.Nama = nama;
+        if (bidang.Nama != nama)
+        {
+            _audit.Add(AuditActions.BidangDiubah, "Bidang", bidang.Id, $"{bidang.Nama} → {nama}");
+            bidang.Nama = nama;
+        }
+
         await _db.SaveChangesAsync();
 
         return Ok(new BidangResponse(bidang.Id, bidang.Nama));

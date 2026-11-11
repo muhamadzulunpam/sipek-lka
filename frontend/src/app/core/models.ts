@@ -143,3 +143,21 @@ export interface UserWithPassword {
 export interface PasswordReset {
   passwordSementara: string;
 }
+
+export interface AuditLogItem {
+  id: number;
+  waktuUtc: string;
+  userId: number | null;
+  namaPengguna: string;
+  aksi: string;
+  aksiLabel: string;
+  tipeData: string | null;
+  dataId: number | null;
+  keterangan: string | null;
+  ipAddress: string | null;
+}
+
+export interface AuditAksi {
+  kode: string;
+  label: string;
+}

@@ -15,11 +15,13 @@ public class BuktiController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly IFileStorage _storage;
+    private readonly IAuditLogger _audit;
 
-    public BuktiController(AppDbContext db, IFileStorage storage)
+    public BuktiController(AppDbContext db, IFileStorage storage, IAuditLogger audit)
     {
         _db = db;
         _storage = storage;
+        _audit = audit;
     }
 
     private static bool CanEdit(StatusLaporan s) =>
@@ -90,6 +92,8 @@ public class BuktiController : ControllerBase
             UkuranByte = file.Length
         };
 
+        _audit.Add(AuditActions.BuktiDiunggah, "Laporan", laporanId, originalName);
+
         _db.BuktiLaporan.Add(bukti);
 
         try
@@ -140,6 +144,8 @@ public class BuktiController : ControllerBase
         var bukti = await _db.BuktiLaporan
             .FirstOrDefaultAsync(b => b.Id == buktiId && b.LaporanKinerjaId == laporanId);
         if (bukti is null) return NotFound();
+
+        _audit.Add(AuditActions.BuktiDihapus, "Laporan", laporanId, bukti.NamaFile);
 
         _db.BuktiLaporan.Remove(bukti);
         await _db.SaveChangesAsync();
