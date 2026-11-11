@@ -1,5 +1,5 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 // Halaman yang butuh login
@@ -20,4 +20,16 @@ export const roleGuard = (role: 'Pimpinan' | 'KepalaBidang'): CanActivateFn => (
   const auth = inject(AuthService);
   const router = inject(Router);
   return auth.session()?.role === role ? true : router.createUrlTree(['/laporan']);
+};
+
+// Selama wajib ganti password, semua halaman diarahkan ke /ganti-password
+export const passwordGuard: CanActivateChildFn = (_route, state) => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const mustChange = auth.session()?.wajibGantiPassword === true;
+
+  if (mustChange && !state.url.startsWith('/ganti-password')) {
+    return router.createUrlTree(['/ganti-password']);
+  }
+  return true;
 };

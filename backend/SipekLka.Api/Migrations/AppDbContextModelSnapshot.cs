@@ -37,6 +37,9 @@ namespace SipekLka.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Nama")
+                        .IsUnique();
+
                     b.ToTable("Bidangs");
 
                     b.HasData(
@@ -290,6 +293,11 @@ namespace SipekLka.Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<bool>("IsAktif")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<string>("NamaLengkap")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -300,6 +308,12 @@ namespace SipekLka.Api.Migrations
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
+
+                    b.Property<int>("TokenVersion")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("WajibGantiPassword")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 

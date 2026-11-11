@@ -31,9 +31,13 @@ public class JwtTokenService : IJwtTokenService
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new("name", user.NamaLengkap),
             new("email", user.Email),
-            new("role", user.Role.Nama)
+            new("role", user.Role.Nama),
+            new("tv", user.TokenVersion.ToString())
         };
 
+        if (user.WajibGantiPassword)
+            claims.Add(new Claim("mcp", "1"));
+            
         if (user.BidangId.HasValue)
             claims.Add(new Claim("bidangId", user.BidangId.Value.ToString()));
 
