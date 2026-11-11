@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<BuktiLaporan> BuktiLaporan => Set<BuktiLaporan>();
     public DbSet<ReviewLaporan> ReviewLaporan => Set<ReviewLaporan>();
     public DbSet<RiwayatStatus> RiwayatStatus => Set<RiwayatStatus>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
 
     protected override void OnModelCreating(ModelBuilder b)
@@ -53,6 +54,14 @@ public class AppDbContext : DbContext
         b.Entity<User>().Property(x => x.IsAktif).HasDefaultValue(true);
         b.Entity<Bidang>().HasIndex(x => x.Nama).IsUnique();
 
+        b.Entity<AuditLog>().Property(x => x.NamaPengguna).HasMaxLength(150).IsRequired();
+        b.Entity<AuditLog>().Property(x => x.Aksi).HasMaxLength(50).IsRequired();
+        b.Entity<AuditLog>().Property(x => x.TipeData).HasMaxLength(50);
+        b.Entity<AuditLog>().Property(x => x.Keterangan).HasMaxLength(500);
+        b.Entity<AuditLog>().Property(x => x.IpAddress).HasMaxLength(45);
+        b.Entity<AuditLog>().HasIndex(x => x.WaktuUtc);
+        b.Entity<AuditLog>().HasIndex(x => x.UserId);
+        b.Entity<AuditLog>().HasIndex(x => x.Aksi);
             
         // Seed data awal
         b.Entity<Role>().HasData(
