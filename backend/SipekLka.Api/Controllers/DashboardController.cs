@@ -75,7 +75,7 @@ public class DashboardController : ControllerBase
         }).ToList();
 
         int? totalKepala = isPimpinan
-            ? await _db.Users.CountAsync(u => u.Role.Nama == "KepalaBidang")
+            ? await _db.Users.CountAsync(u => u.Role.Nama == "KepalaBidang" && u.IsAktif)
             : null;
 
         return Ok(new DashboardResponse(
