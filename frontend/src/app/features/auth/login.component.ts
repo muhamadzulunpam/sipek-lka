@@ -485,7 +485,9 @@ export class LoginComponent {
         this.error.set(
           err.status === 401
             ? 'Email atau password salah.'
-            : 'Tidak dapat terhubung ke server.'
+            : err.status === 403
+              ? (err.error?.message ?? 'Akun tidak dapat masuk.')
+              : 'Tidak dapat terhubung ke server.'
         );
       },
     });

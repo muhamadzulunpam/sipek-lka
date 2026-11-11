@@ -58,4 +58,10 @@ export class AuthService {
       return null;
     }
   }
+  
+  changePassword(passwordLama: string, passwordBaru: string) {
+    return this.http
+      .post<LoginResponse>(`${API_URL}/auth/change-password`, { passwordLama, passwordBaru })
+      .pipe(tap(res => this.store(res))); // simpan token baru dari server
+  }
 }
