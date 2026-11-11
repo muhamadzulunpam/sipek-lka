@@ -21,6 +21,9 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 builder.Services.AddSingleton<IFileStorage, LocalFileStorage>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuditLogger, AuditLogger>();
+
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Jwt:Key belum diatur. Gunakan dotnet user-secrets.");
 
