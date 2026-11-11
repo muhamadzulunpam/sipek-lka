@@ -12,4 +12,8 @@ public class User
 
     public int? BidangId { get; set; }   // null untuk Pimpinan
     public Bidang? Bidang { get; set; }
+    
+    public bool IsAktif { get; set; } = true;
+    public bool WajibGantiPassword { get; set; }
+    public int TokenVersion { get; set; }
 }

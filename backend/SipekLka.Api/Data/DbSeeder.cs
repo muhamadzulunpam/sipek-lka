@@ -9,16 +9,23 @@ public static class DbSeeder
     {
         if (await db.Users.AnyAsync()) return;
 
-        string Hash() => BCrypt.Net.BCrypt.HashPassword(defaultPassword);
+        User Make(string nama, string email, int roleId, int? bidangId) => new()
+        {
+            NamaLengkap = nama,
+            Email = email,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(defaultPassword),
+            RoleId = roleId,
+            BidangId = bidangId,
+            WajibGantiPassword = true
+        };
 
         db.Users.AddRange(
-            new User { NamaLengkap = "Andri Priadi, S.E., M.M.", Email = "pimpinan@lka.local", PasswordHash = Hash(), RoleId = 1 },
-            new User { NamaLengkap = "Aisyah Al-Baroroh", Email = "beasiswa@lka.local", PasswordHash = Hash(), RoleId = 2, BidangId = 1 },
-            new User { NamaLengkap = "Ir. Tri Prasetyo", Email = "tracer@lka.local", PasswordHash = Hash(), RoleId = 2, BidangId = 2 },
-            new User { NamaLengkap = "Roeslan Djutalov", Email = "ormawa@lka.local", PasswordHash = Hash(), RoleId = 2, BidangId = 3 },
-            new User { NamaLengkap = "M. Ahsan Tampubolon", Email = "mental@lka.local", PasswordHash = Hash(), RoleId = 2, BidangId = 4 },
-            new User { NamaLengkap = "Risza Putri Elburdah", Email = "karier@lka.local", PasswordHash = Hash(), RoleId = 2, BidangId = 5 }
-        );
+            Make("Andri Priadi, S.E., M.M.", "pimpinan@lka.local", 1, null),
+            Make("Aisyah Al-Baroroh", "beasiswa@lka.local", 2, 1),
+            Make("Ir. Tri Prasetyo", "tracer@lka.local", 2, 2),
+            Make("Roeslan Djutalov", "ormawa@lka.local", 2, 3),
+            Make("M. Ahsan Tampubolon", "mental@lka.local", 2, 4),
+            Make("Risza Putri Elburdah", "karier@lka.local", 2, 5));
 
         await db.SaveChangesAsync();
     }
