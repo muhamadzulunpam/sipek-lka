@@ -40,6 +40,10 @@ import { AuthService } from '../core/auth.service';
                 <span class="nav-icon">🏛️</span>
                 @if (!collapsed()) { <span>Bidang</span> }
               </a>
+              <a class="nav-item" routerLink="/audit" routerLinkActive="active">
+                <span class="nav-icon">📜</span>
+                @if (!collapsed()) { <span>Audit</span> }
+              </a>
             }
           </nav>
         }
