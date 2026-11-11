@@ -16,13 +16,14 @@ public class LaporanController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly IFileStorage _storage;
+    private readonly IAuditLogger _audit;
 
-    public LaporanController(AppDbContext db, IFileStorage storage)
+    public LaporanController(AppDbContext db, IFileStorage storage, IAuditLogger audit)
     {
         _db = db;
         _storage = storage;
+        _audit = audit;
     }
-
     // --- Informasi user dari token ---
     private int CurrentUserId => int.Parse(User.FindFirst("sub")!.Value);
     private int? CurrentBidangId =>
@@ -113,8 +114,12 @@ public class LaporanController : ControllerBase
         };
         Apply(laporan, request);
 
+        await using var tx = await _db.Database.BeginTransactionAsync();
         _db.LaporanKinerja.Add(laporan);
         await _db.SaveChangesAsync();
+        _audit.Add(AuditActions.LaporanDibuat, "Laporan", laporan.Id, laporan.NamaKegiatan);
+        await _db.SaveChangesAsync();
+        await tx.CommitAsync();
 
         var response = await _db.LaporanKinerja
             .Where(l => l.Id == laporan.Id)
@@ -136,6 +141,7 @@ public class LaporanController : ControllerBase
             return Conflict(new { message = "Laporan hanya bisa diubah saat berstatus Draft atau Revision." });
 
         Apply(laporan, request);
+        _audit.Add(AuditActions.LaporanDiubah, "Laporan", laporan.Id, laporan.NamaKegiatan);
         await _db.SaveChangesAsync();
 
         return NoContent();
@@ -155,6 +161,9 @@ public class LaporanController : ControllerBase
             return Conflict(new { message = "Hanya laporan berstatus Draft yang bisa dihapus." });
 
         var storedNames = laporan.Bukti.Select(b => b.PathFile).ToList();
+
+        _audit.Add(AuditActions.LaporanDihapus, "Laporan", laporan.Id,
+            $"{laporan.NamaKegiatan} ({laporan.Bukti.Count} bukti ikut dihapus)");
 
         _db.LaporanKinerja.Remove(laporan);
         await _db.SaveChangesAsync();

@@ -13,11 +13,14 @@ namespace SipekLka.Api.Controllers;
 [Route("api/laporan/{laporanId:int}")]
 public class LaporanWorkflowController : ControllerBase
 {
+    
     private readonly AppDbContext _db;
+    private readonly IAuditLogger _audit;
 
-    public LaporanWorkflowController(AppDbContext db)
+    public LaporanWorkflowController(AppDbContext db, IAuditLogger audit)
     {
         _db = db;
+        _audit = audit;
     }
 
     private int CurrentUserId => int.Parse(User.FindFirst("sub")!.Value);
@@ -67,6 +70,8 @@ public class LaporanWorkflowController : ControllerBase
             DiubahOlehUserId = CurrentUserId
         });
 
+        _audit.Add(AuditActions.LaporanDikirim, "Laporan", laporan.Id, laporan.NamaKegiatan);
+
         var error = await TrySaveAsync();
         if (error is not null) return error;
 
@@ -113,6 +118,9 @@ public class LaporanWorkflowController : ControllerBase
             Keterangan = "Hasil review pimpinan",
             DiubahOlehUserId = CurrentUserId
         });
+        
+        _audit.Add(AuditActions.LaporanDireview, "Laporan", laporan.Id,
+            $"{laporan.NamaKegiatan}: {keputusan}");
 
         var error = await TrySaveAsync();
         if (error is not null) return error;

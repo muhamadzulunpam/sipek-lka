@@ -17,10 +17,12 @@ public class UsersController : ControllerBase
         "Bidang ini sudah memiliki Kepala Bidang aktif. Nonaktifkan akun lama terlebih dahulu.";
 
     private readonly AppDbContext _db;
+    private readonly IAuditLogger _audit;
 
-    public UsersController(AppDbContext db)
+    public UsersController(AppDbContext db, IAuditLogger audit)
     {
         _db = db;
+        _audit = audit;
     }
 
     // Semua endpoint hanya menyentuh akun Kepala Bidang
@@ -28,6 +30,8 @@ public class UsersController : ControllerBase
 
     private static UserResponse ToResponse(User u) =>
         new(u.Id, u.NamaLengkap, u.Email, u.BidangId, u.Bidang?.Nama, u.IsAktif, u.WajibGantiPassword);
+
+    private static string Describe(User u) => $"{u.NamaLengkap} ({u.Email})";
 
     private Task<bool> BidangPunyaKepalaAktif(int bidangId, int exceptUserId = 0) =>
         KepalaQuery.AnyAsync(u => u.BidangId == bidangId && u.IsAktif && u.Id != exceptUserId);
@@ -75,8 +79,14 @@ public class UsersController : ControllerBase
             WajibGantiPassword = true
         };
 
+        // Transaksi: ID akun baru baru diketahui setelah disimpan, lalu dicatat ke log
+        await using var tx = await _db.Database.BeginTransactionAsync();
         _db.Users.Add(user);
         await _db.SaveChangesAsync();
+        _audit.Add(AuditActions.UserDibuat, "User", user.Id, $"{Describe(user)}, bidang {bidang.Nama}");
+        await _db.SaveChangesAsync();
+        await tx.CommitAsync();
+
         user.Bidang = bidang;
 
         return StatusCode(StatusCodes.Status201Created,
@@ -104,6 +114,12 @@ public class UsersController : ControllerBase
         if (bidangBerubah && user.IsAktif && await BidangPunyaKepalaAktif(bidang.Id, id))
             return Conflict(new { message = BidangSudahAdaKepala });
 
+        // Catat perubahan SEBELUM nilai lama ditimpa
+        var perubahan = new List<string>();
+        if (user.NamaLengkap != nama) perubahan.Add($"nama: {user.NamaLengkap} → {nama}");
+        if (user.Email != email) perubahan.Add($"email: {user.Email} → {email}");
+        if (bidangBerubah) perubahan.Add($"bidang: {user.Bidang?.Nama} → {bidang.Nama}");
+
         user.NamaLengkap = nama;
         user.Email = email;
         user.BidangId = bidang.Id;
@@ -111,6 +127,9 @@ public class UsersController : ControllerBase
 
         // Claim bidangId di token lama sudah tidak benar, paksa login ulang
         if (bidangBerubah) user.TokenVersion++;
+
+        if (perubahan.Count > 0)
+            _audit.Add(AuditActions.UserDiubah, "User", user.Id, string.Join("; ", perubahan));
 
         await _db.SaveChangesAsync();
         return Ok(ToResponse(user));
@@ -125,6 +144,7 @@ public class UsersController : ControllerBase
 
         user.IsAktif = false;
         user.TokenVersion++; // sesi yang sedang berjalan langsung mati
+        _audit.Add(AuditActions.UserDinonaktifkan, "User", user.Id, Describe(user));
         await _db.SaveChangesAsync();
         return NoContent();
     }
@@ -140,6 +160,7 @@ public class UsersController : ControllerBase
             return Conflict(new { message = BidangSudahAdaKepala });
 
         user.IsAktif = true;
+        _audit.Add(AuditActions.UserDiaktifkan, "User", user.Id, Describe(user));
         await _db.SaveChangesAsync();
         return NoContent();
     }
@@ -155,6 +176,9 @@ public class UsersController : ControllerBase
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
         user.WajibGantiPassword = true;
         user.TokenVersion++; // sesi lama mati
+
+        // Password sementara TIDAK PERNAH masuk log
+        _audit.Add(AuditActions.UserResetPassword, "User", user.Id, Describe(user));
         await _db.SaveChangesAsync();
 
         return Ok(new PasswordResetResponse(password));
