@@ -8,6 +8,7 @@ export interface LoginResponse {
   role: 'Pimpinan' | 'KepalaBidang';
   bidangId: number | null;
   namaBidang: string | null;
+  wajibGantiPassword: boolean;
 }
 
 export interface Bidang {
@@ -116,4 +117,29 @@ export interface DashboardResponse {
   rejected: number;
   totalKepalaBidang: number | null;
   perBidang: BidangStat[];
+}
+
+export interface UserItem {
+  id: number;
+  namaLengkap: string;
+  email: string;
+  bidangId: number | null;
+  namaBidang: string | null;
+  isAktif: boolean;
+  wajibGantiPassword: boolean;
+}
+
+export interface UserRequest {
+  namaLengkap: string;
+  email: string;
+  bidangId: number;
+}
+
+export interface UserWithPassword {
+  user: UserItem;
+  passwordSementara: string;
+}
+
+export interface PasswordReset {
+  passwordSementara: string;
 }
