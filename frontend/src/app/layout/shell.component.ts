@@ -19,19 +19,40 @@ import { AuthService } from '../core/auth.service';
           }
         </div>
 
-        <!-- MENU NAVIGASI -->
-        <nav class="nav">
-          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
-            <span class="nav-icon">🏠</span>
-            @if (!collapsed()) { <span>Dashboard</span> }
-          </a>
-          <a class="nav-item" routerLink="/laporan" routerLinkActive="active">
-            <span class="nav-icon">📝</span>
-            @if (!collapsed()) { <span>Laporan</span> }
-          </a>
-        </nav>
+        <!-- NAVIGATION MENU -->
+        @if (!auth.session()?.wajibGantiPassword) {
+          <nav class="nav">
+            <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+              <span class="nav-icon">🏠</span>
+              @if (!collapsed()) { <span>Dashboard</span> }
+            </a>
+            <a class="nav-item" routerLink="/laporan" routerLinkActive="active">
+              <span class="nav-icon">📝</span>
+              @if (!collapsed()) { <span>Laporan</span> }
+            </a>
+            
+            @if (auth.session()?.role === 'Pimpinan') {
+              <a class="nav-item" routerLink="/pengguna" routerLinkActive="active">
+                <span class="nav-icon">👥</span>
+                @if (!collapsed()) { <span>Pengguna</span> }
+              </a>
+              <a class="nav-item" routerLink="/bidang" routerLinkActive="active">
+                <span class="nav-icon">🏛️</span>
+                @if (!collapsed()) { <span>Bidang</span> }
+              </a>
+            }
+          </nav>
+        }
 
+        <!-- FOOTER SIDEBAR -->
         <div class="sidebar-footer">
+          @if (!auth.session()?.wajibGantiPassword) {
+            <a class="nav-item pw-link" routerLink="/ganti-password" routerLinkActive="active">
+              <span class="nav-icon">🔑</span>
+              @if (!collapsed()) { <span>Ganti Password</span> }
+            </a>
+          }
+          
           <button type="button" class="nav-item logout" (click)="auth.logout()">
             <span class="nav-icon">🚪</span>
             @if (!collapsed()) { <span>Keluar</span> }
@@ -196,7 +217,6 @@ import { AuthService } from '../core/auth.service';
       box-sizing: border-box;
     }
 
-    /* Saat collapsed, tombol menu dibuat kotak & center */
     .sidebar.collapsed .nav-item {
       justify-content: center;
       padding: 12px 0;
@@ -218,10 +238,14 @@ import { AuthService } from '../core/auth.service';
       box-shadow: 0 6px 18px rgba(74, 158, 255, 0.28);
     }
 
+    /* ===== SIDEBAR FOOTER ===== */
     .sidebar-footer {
       position: relative;
       padding-top: 14px;
       margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
     .sidebar-footer::before {
       content: '';
@@ -233,6 +257,22 @@ import { AuthService } from '../core/auth.service';
       background: rgba(255, 255, 255, 0.35);
     }
 
+    /* Link Ganti Password */
+    .pw-link {
+      color: #0d3363;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pw-link:hover {
+      background: rgba(255, 255, 255, 0.45);
+    }
+    .pw-link.active {
+      background: #ffffff;
+      color: #2e82e6;
+      box-shadow: 0 6px 18px rgba(74, 158, 255, 0.28);
+    }
+
+    /* Tombol Logout */
     .logout {
       color: #b91c1c;
     }

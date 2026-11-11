@@ -1,5 +1,6 @@
+
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, roleGuard } from './core/auth.guard';
+import { authGuard, guestGuard, passwordGuard, roleGuard } from './core/auth.guard';
 
 export const routes: Routes = [
   {
@@ -11,9 +12,27 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [authGuard],
+    canActivateChild: [passwordGuard],
     loadComponent: () =>
       import('./layout/shell.component').then(m => m.ShellComponent),
     children: [
+      {
+        path: 'ganti-password',
+        loadComponent: () =>
+          import('./features/account/change-password.component').then(m => m.ChangePasswordComponent),
+      },
+      {
+        path: 'pengguna',
+        canActivate: [roleGuard('Pimpinan')],
+        loadComponent: () =>
+          import('./features/admin/users.component').then(m => m.UsersComponent),
+      },
+      {
+        path: 'bidang',
+        canActivate: [roleGuard('Pimpinan')],
+        loadComponent: () =>
+          import('./features/admin/bidang-admin.component').then(m => m.BidangAdminComponent),
+      },
       {
         path: 'laporan',
         children: [
@@ -41,15 +60,20 @@ export const routes: Routes = [
           },
         ],
       },
-
       {
         path: 'dashboard',
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
       },
-
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard',
+      },
     ],
   },
-  { path: '**', redirectTo: '' },
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
